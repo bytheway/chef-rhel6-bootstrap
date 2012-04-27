@@ -94,8 +94,20 @@ if [ $STEP -le 4 ]; then
 fi
 
 
+if [ $STEP -le 5 ]; then
 
+  ###################################################
+  # install rabbitmq
 
+  if [ ! -f rabbitmq-server-generic-unix-2.8.1.tar.gz ]; then
+    wget http://www.rabbitmq.com/releases/rabbitmq-server/v2.8.1/rabbitmq-server-generic-unix-2.8.1.tar.gz
+  fi
 
+  cd /usr/local
+  tar xzf rabbitmq-server-2.8.1.tar.gz
+  cd -
+
+  STEP=6
+fi
 
 
