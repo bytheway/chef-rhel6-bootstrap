@@ -11,7 +11,6 @@ else
   STEP=1
 fi
 
-
 yum install -y gcc libtool libicu-devel openssl-devel autoconf213 gcc-c++
 
 if [ $STEP -le 1 ]; then
@@ -29,6 +28,10 @@ if [ $STEP -le 1 ]; then
   make
   make install
   cd ..
+
+  cd /usr/local/bin
+  ln -s /usr/local/erlang/bin/erl
+  cd -
 
   STEP=2
 fi
@@ -103,11 +106,48 @@ if [ $STEP -le 5 ]; then
     wget http://www.rabbitmq.com/releases/rabbitmq-server/v2.8.1/rabbitmq-server-generic-unix-2.8.1.tar.gz
   fi
 
-  cd /usr/local
-  tar xzf rabbitmq-server-2.8.1.tar.gz
-  cd -
+  tar xzf rabbitmq-server-generic-unix-2.8.1.tar.gz
+  mv rabbitmq_server-2.8.1 /usr/local/rabbitmq
 
   STEP=6
+fi
+
+if [ $STEP -le 6 ]; then
+
+  ###################################################
+  # configure rabbitmq
+
+  pushd /usr/local/rabbitmq/sbin
+
+  ./rabbitmq-server -detached
+  sleep 5
+
+  ./rabbitmqctl add_vhost /chef
+  ./rabbitmqctl add_user chef testing
+  ./rabbitmqctl set_permissions -p /chef chef ".*" ".*" ".*"
+
+  ./rabbitmqctl stop
+
+  popd
+ 
+  STEP=7
+fi
+
+if [ $STEP -le 7 ]; then
+
+  ###################################################
+  # configure gecode
+
+
+  if [ ! -f gecode-3.7.2.tar.gz ]; then
+    wget http://www.gecode.org/download/gecode-3.7.2.tar.gz
+  fi
+
+  tar zxvf gecode-3.7.2.tar.gz
+  cd gecode-3.7.2 && ./configure
+  make && make install
+ 
+  STEP=8
 fi
 
 
